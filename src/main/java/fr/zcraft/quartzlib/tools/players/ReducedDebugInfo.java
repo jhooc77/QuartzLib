@@ -62,8 +62,10 @@ public final class ReducedDebugInfo {
 
     static {
         try {
-            entityClass = Reflection.getMinecraftClassByName("Entity");
-            packetPlayOutEntityStatusClass = Reflection.getMinecraftClassByName("PacketPlayOutEntityStatus");
+            entityClass =
+                    Reflection.getMinecraftClassByName("world.entity.Entity");
+            packetPlayOutEntityStatusClass =
+                    Reflection.getMinecraftClassByName("network.protocol.game.PacketPlayOutEntityStatus");
 
             enabled = true;
         } catch (ClassNotFoundException e) {

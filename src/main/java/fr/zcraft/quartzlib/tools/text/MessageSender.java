@@ -57,23 +57,23 @@ public final class MessageSender {
 
     static {
         try {
-            iChatBaseComponentClass = Reflection.getMinecraftClassByName("IChatBaseComponent");
-            packetPlayOutChatClass = Reflection.getMinecraftClassByName("PacketPlayOutChat");
+            iChatBaseComponentClass = Reflection.getMinecraftClassByName("network.chat.IChatBaseComponent");
+            packetPlayOutChatClass = Reflection.getMinecraftClassByName("network.protocol.game.PacketPlayOutChat");
 
             // TODO centralize the chat serialization mechanisms
             try {
                 chatSerializerClass = Reflection.getMinecraftClassByName("ChatSerializer");
             } catch (ClassNotFoundException e) {
-                chatSerializerClass = Reflection.getMinecraftClassByName("IChatBaseComponent$ChatSerializer");
+                chatSerializerClass = Reflection.getMinecraftClassByName("network.chat.IChatBaseComponent$ChatSerializer");
             }
 
             // We only support 1.8+
             if (!nmsVersion.equalsIgnoreCase("v1_8_R1")) {
-                chatComponentTextClass = Reflection.getMinecraftClassByName("ChatComponentText");
+                chatComponentTextClass = Reflection.getMinecraftClassByName("network.chat.ChatComponentText");
 
                 // This enum was introduced in 1.12;  before, a byte was directly used.
                 try {
-                    chatMessageTypeEnum = Reflection.getMinecraftClassByName("ChatMessageType");
+                    chatMessageTypeEnum = Reflection.getMinecraftClassByName("network.chat.ChatMessageType");
                     chatMessageByteToTypeMethod = Reflection.findMethod(chatMessageTypeEnum, "a", byte.class);
 
                     if (chatMessageByteToTypeMethod == null) {

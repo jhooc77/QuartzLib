@@ -57,18 +57,18 @@ public final class Titles {
     static {
         try {
             packetPlayOutTitleClass = Reflection.getMinecraftClassByName("PacketPlayOutTitle");
-            iChatBaseComponentClass = Reflection.getMinecraftClassByName("IChatBaseComponent");
+            iChatBaseComponentClass = Reflection.getMinecraftClassByName("network.chat.IChatBaseComponent");
 
             try {
                 chatSerializerClass = Reflection.getMinecraftClassByName("ChatSerializer");
             } catch (ClassNotFoundException e) {
-                chatSerializerClass = Reflection.getMinecraftClassByName("IChatBaseComponent$ChatSerializer");
+                chatSerializerClass = Reflection.getMinecraftClassByName("network.chat.IChatBaseComponent$ChatSerializer");
             }
 
             try {
                 enumTitleActionClass = Reflection.getMinecraftClassByName("PacketPlayOutTitle$EnumTitleAction");
             } catch (ClassNotFoundException e) {
-                enumTitleActionClass = Reflection.getMinecraftClassByName("EnumTitleAction");
+                    enumTitleActionClass = Reflection.getMinecraftClassByName("EnumTitleAction");
             }
 
             for (Object enumConstant : enumTitleActionClass.getEnumConstants()) {

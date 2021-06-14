@@ -50,10 +50,10 @@ public final class NMSNetwork {
     static {
         try {
             craftPlayerClass = Reflection.getBukkitClassByName("entity.CraftPlayer");
-            entityPlayerClass = Reflection.getMinecraftClassByName("EntityPlayer");
+            entityPlayerClass = Reflection.getMinecraftClassByName("server.level.EntityPlayer");
 
-            packetClass = Reflection.getMinecraftClassByName("Packet");
-            sendPacketMethod = ((Class<?>) Reflection.getMinecraftClassByName("PlayerConnection"))
+            packetClass = Reflection.getMinecraftClassByName("network.protocol.Packet");
+            sendPacketMethod = ((Class<?>) Reflection.getMinecraftClassByName("server.network.PlayerConnection"))
                     .getDeclaredMethod("sendPacket", packetClass);
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             throw new IncompatibleMinecraftVersionException("Cannot load classes needed to send network packets", e);

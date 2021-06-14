@@ -70,6 +70,7 @@ public class PromptGui extends GuiBase {
 
     /**
      * Creates a new prompt GUI, using the given callback.
+     *
      * @param callback The callback to be given the input text to.
      */
     public PromptGui(Callback<String> callback) {
@@ -103,11 +104,16 @@ public class PromptGui extends GuiBase {
         isInitialized = true;
 
         try {
-            final Class<?> CraftBlockEntityState = Reflection.getBukkitClassByName("block.CraftBlockEntityState");
-            final Class<?> CraftSign = Reflection.getBukkitClassByName("block.CraftSign");
-            final Class<?> classTileEntitySign = Reflection.getMinecraftClassByName("TileEntitySign");
-            final Class<?> CraftPlayer = Reflection.getBukkitClassByName("entity.CraftPlayer");
-            final Class<?> EntityHuman = Reflection.getMinecraftClassByName("EntityHuman");
+            final Class<?> CraftBlockEntityState =
+                    Reflection.getBukkitClassByName("block.CraftBlockEntityState");
+            final Class<?> CraftSign =
+                    Reflection.getBukkitClassByName("block.CraftSign");
+            final Class<?> classTileEntitySign =
+                    Reflection.getMinecraftClassByName("server.level.block.entity.TileEntitySign");
+            final Class<?> CraftPlayer =
+                    Reflection.getBukkitClassByName("entity.CraftPlayer");
+            final Class<?> EntityHuman =
+                    Reflection.getMinecraftClassByName("server.world.entity.player.EntityHuman");
 
             try {
                 fieldTileEntitySign = Reflection.getField(CraftSign, "sign");

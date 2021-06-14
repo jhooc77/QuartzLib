@@ -85,17 +85,18 @@ public class ObjectiveSender {
 
     static {
         try {
-            chatComponentText = Reflection.getMinecraftClassByName("ChatComponentText");
+            chatComponentText = Reflection.getMinecraftClassByName("network.chat.ChatComponentText");
         } catch (ClassNotFoundException e) {
             chatComponentText = null;
         }
 
         try {
             packetPlayOutScoreboardObjectiveClass =
-                    Reflection.getMinecraftClassByName("PacketPlayOutScoreboardObjective");
+                    Reflection.getMinecraftClassByName("network.protocol.game.PacketPlayOutScoreboardObjective");
             packetPlayOutScoreboardDisplayObjectiveClass =
-                    Reflection.getMinecraftClassByName("PacketPlayOutScoreboardDisplayObjective");
-            packetPlayOutScoreboardScoreClass = Reflection.getMinecraftClassByName("PacketPlayOutScoreboardScore");
+                    Reflection.getMinecraftClassByName("network.protocol.game.PacketPlayOutScoreboardDisplayObjective");
+            packetPlayOutScoreboardScoreClass =
+                    Reflection.getMinecraftClassByName("network.protocol.game.PacketPlayOutScoreboardScore");
 
 
             // IScoreboardCriteria.EnumScoreboardHealthDisplay.INTEGER value
@@ -103,7 +104,8 @@ public class ObjectiveSender {
             Class<?> enumScoreboardHealthDisplay;
             try {
                 enumScoreboardHealthDisplay =
-                        Reflection.getMinecraftClassByName("IScoreboardCriteria$EnumScoreboardHealthDisplay");
+                        Reflection.getMinecraftClassByName(
+                                "world.scores.criteria.IScoreboardCriteria$EnumScoreboardHealthDisplay");
             } catch (ClassNotFoundException e) {
                 enumScoreboardHealthDisplay = Reflection.getMinecraftClassByName("EnumScoreboardHealthDisplay");
             }
@@ -126,12 +128,12 @@ public class ObjectiveSender {
             Class<?> enumScoreboardAction;
             try {
                 enumScoreboardAction =
-                        Reflection.getMinecraftClassByName("PacketPlayOutScoreboardScore$EnumScoreboardAction");
+                        Reflection.getMinecraftClassByName("network.protocol.game.PacketPlayOutScoreboardScore$EnumScoreboardAction");
             } catch (ClassNotFoundException e) {
                 try {
                     enumScoreboardAction = Reflection.getMinecraftClassByName("EnumScoreboardAction");
                 } catch (ClassNotFoundException ex) {
-                    enumScoreboardAction = Reflection.getMinecraftClassByName("ScoreboardServer$Action");
+                    enumScoreboardAction = Reflection.getMinecraftClassByName("server.ScoreboardServer$Action");
                 }
             }
 

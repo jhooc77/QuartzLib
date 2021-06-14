@@ -53,13 +53,14 @@ public final class ListHeaderFooter {
     static {
         try {
             packetPlayOutPlayerListHeaderFooterClass =
-                    Reflection.getMinecraftClassByName("PacketPlayOutPlayerListHeaderFooter");
-            iChatBaseComponentClass = Reflection.getMinecraftClassByName("IChatBaseComponent");
+                    Reflection.getMinecraftClassByName("network.protocol.game.PacketPlayOutPlayerListHeaderFooter");
+            iChatBaseComponentClass = Reflection.getMinecraftClassByName("network.chat.IChatBaseComponent");
 
             try {
                 chatSerializerClass = Reflection.getMinecraftClassByName("ChatSerializer");
             } catch (ClassNotFoundException e) {
-                chatSerializerClass = Reflection.getMinecraftClassByName("IChatBaseComponent$ChatSerializer");
+                chatSerializerClass =
+                        Reflection.getMinecraftClassByName("network.chat.IChatBaseComponent$ChatSerializer");
             }
         } catch (Exception e) {
             enabled = false;

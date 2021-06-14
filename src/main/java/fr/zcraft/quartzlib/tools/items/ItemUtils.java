@@ -255,8 +255,8 @@ public abstract class ItemUtils {
         }
 
         try {
-            Class<?> minecraftItemClass = Reflection.getMinecraftClassByName("Item");
-            Class<?> minecraftItemStackClass = Reflection.getMinecraftClassByName("ItemStack");
+            Class<?> minecraftItemClass = Reflection.getMinecraftClassByName("world.item.Item");
+            Class<?> minecraftItemStackClass = Reflection.getMinecraftClassByName("world.item.ItemStack");
             Class<?> craftItemStackClass = Reflection.getBukkitClassByName("inventory.CraftItemStack");
             Object itemStackHandle = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
             Object minecraftItem = Reflection.getFieldValue(itemStackHandle, "item");
@@ -295,7 +295,7 @@ public abstract class ItemUtils {
         }
 
         try {
-            Class minecraftItem = Reflection.getMinecraftClassByName("Item");
+            Class minecraftItem = Reflection.getMinecraftClassByName("world.item.Item");
             Object materialsRegistry = Reflection.getFieldValue(minecraftItem, null, "REGISTRY");
 
             Method getMethod = Reflection.findMethod(materialsRegistry.getClass(), "get", (Type) null);
@@ -341,7 +341,7 @@ public abstract class ItemUtils {
             }
 
             Object minecraftItem = Reflection.getFieldValue(craftItemStack, "item");
-            Class<?> minecraftItemClass = Reflection.getMinecraftClassByName("Item");
+            Class<?> minecraftItemClass = Reflection.getMinecraftClassByName("world.item.Item");
             Object itemsRegistry = Reflection.getFieldValue(minecraftItemClass, null, "REGISTRY");
 
             Object minecraftKey = getRegistryLookupMethod().invoke(itemsRegistry, minecraftItem);
@@ -448,9 +448,9 @@ public abstract class ItemUtils {
         String potionKey = getI18nPotionKey(item);
 
         try {
-            Class<?> potionUtil = Reflection.getMinecraftClassByName("PotionUtil");
-            Class<?> potionRegistry = Reflection.getMinecraftClassByName("PotionRegistry");
-            Class<?> itemStackClass = Reflection.getMinecraftClassByName("ItemStack");
+            Class<?> potionUtil = Reflection.getMinecraftClassByName("world.item.alchemy.PotionUtil");
+            Class<?> potionRegistry = Reflection.getMinecraftClassByName("world.item.alchemy.PotionRegistry");
+            Class<?> itemStackClass = Reflection.getMinecraftClassByName("world.item.ItemStack");
             Object registry = Reflection.findMethod(potionUtil, null, potionRegistry, 0, itemStackClass)
                     .invoke(null, asNMSCopy(item));
 

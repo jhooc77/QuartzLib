@@ -262,8 +262,8 @@ public abstract class NBT {
             return; // Already initialized
         }
 
-        MC_ITEM_STACK = getMinecraftClass("ItemStack");
-        MC_NBT_TAG_COMPOUND = getMinecraftClass("NBTTagCompound");
+        MC_ITEM_STACK = getMinecraftClass("server.world.item.ItemStack");
+        MC_NBT_TAG_COMPOUND = getMinecraftClass("nbt.NBTTagCompound");
         CB_CRAFT_ITEM_META = getCraftBukkitClass("inventory.CraftMetaItem");
     }
 

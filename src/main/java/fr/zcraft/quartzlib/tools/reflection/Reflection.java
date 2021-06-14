@@ -100,13 +100,13 @@ public final class Reflection {
      * Returns the {@link Class} of a NMS class from it's name (without the main NMS package).
      * <p>For example, with "Server", this method returns the {@code net.minecraft.server.v1_X_RX.Server} class.</p>
      *
-     * @param name The NMS' class name with the prefix (for 1.17+ only). e.g: "world.entity"
+     * @param name The NMS' class name with the prefix (for 1.17+ only). e.g: "server.world.entity.player.EntityHuman"
      * @return The class.
      * @throws ClassNotFoundException if no class exists with this name in the NMS package.
      */
     public static Class getMinecraftClassByName(String name) throws ClassNotFoundException {
         try {
-            return Class.forName("net.minecraft.server." + name);
+            return Class.forName("net.minecraft." + name);
         } catch (ClassNotFoundException ex) {
             //Fallback to old package naming
             return Class.forName(getMinecraftPackageName() + "." + name);
