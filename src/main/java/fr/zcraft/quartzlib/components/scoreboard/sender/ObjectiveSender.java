@@ -128,7 +128,8 @@ public class ObjectiveSender {
             Class<?> enumScoreboardAction;
             try {
                 enumScoreboardAction =
-                        Reflection.getMinecraftClassByName("network.protocol.game.PacketPlayOutScoreboardScore$EnumScoreboardAction");
+                        Reflection.getMinecraftClassByName(
+                                "network.protocol.game.PacketPlayOutScoreboardScore$EnumScoreboardAction");
             } catch (ClassNotFoundException e) {
                 try {
                     enumScoreboardAction = Reflection.getMinecraftClassByName("EnumScoreboardAction");

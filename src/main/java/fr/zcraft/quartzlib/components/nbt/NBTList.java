@@ -32,6 +32,7 @@ package fr.zcraft.quartzlib.components.nbt;
 
 import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.reflection.Reflection;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -91,23 +92,34 @@ public class NBTList implements List<Object> {
 
     static void guessAndWriteTypeToNbtTagList(Object nmsNbtTag) {
         try {
-            final NBTType currentType = NBTType.fromId((byte) Reflection.getFieldValue(nmsNbtTag, "type"));
-            if (currentType.equals(NBTType.TAG_END)) {
-                // We retrieve the first element of the internal list and use it as
-                // the list type, if the list is not empty.
-                @SuppressWarnings("unchecked") final List<Object> internalNbtList =
-                        (List<Object>) Reflection.getFieldValue(nmsNbtTag, "list");
+            final NBTType currentType = NBTType.fromId((byte) Reflection.call(nmsNbtTag, "e"));
+            //public byte e() {
+            //        return this.type;
+            //    }
 
-                if (!internalNbtList.isEmpty()) {
-                    Reflection.setFieldValue(nmsNbtTag, "type",
-                            (byte) NBTType.fromNmsNbtTag(internalNbtList.get(0)).getId());
+
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException  e) {
+            try {
+                final NBTType currentType = NBTType.fromId((byte) Reflection.getFieldValue(nmsNbtTag, "type"));
+
+                if (currentType.equals(NBTType.TAG_END)) {
+                    // We retrieve the first element of the internal list and use it as
+                    // the list type, if the list is not empty.
+                    @SuppressWarnings("unchecked") final List<Object> internalNbtList =
+                            (List<Object>) Reflection.getFieldValue(nmsNbtTag, "list");
+
+                    if (!internalNbtList.isEmpty()) {
+                        Reflection.setFieldValue(nmsNbtTag, "type",
+                                (byte) NBTType.fromNmsNbtTag(internalNbtList.get(0)).getId());
+                    }
                 }
+            } catch (NoSuchFieldException | IllegalAccessException ex) {
+                PluginLogger
+                        .error("Unable to set NBTTagList's type."
+                                + " Such malformed lists cannot be read by Minecraft most of the time.", e);
             }
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            PluginLogger
-                    .error("Unable to set NBTTagList's type."
-                                    + " Such malformed lists cannot be read by Minecraft most of the time.", e);
         }
+
     }
 
     private List<Object> getNbtList() {
@@ -142,7 +154,7 @@ public class NBTList implements List<Object> {
                 this.type = NBTType.fromId((byte) Reflection.getFieldValue(nmsNbtTag, "type"));
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 PluginLogger.error("Unable to retrieve NBTTagList's type."
-                                + " The type will be guessed next time an element is inserted into the list…", e);
+                        + " The type will be guessed next time an element is inserted into the list…", e);
             }
         }
     }
@@ -160,7 +172,7 @@ public class NBTList implements List<Object> {
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 PluginLogger
                         .error("Unable to set NBTTagList's type."
-                                        + " Such malformed lists cannot be read by Minecraft most of the time.", e);
+                                + " Such malformed lists cannot be read by Minecraft most of the time.", e);
             }
         }
     }
@@ -355,7 +367,7 @@ public class NBTList implements List<Object> {
     /**
      * Returns the value at the specified position in this list, or the specified default value if this value is null.
      * If a value is present, but could not be coerced to the given type,
-     *     it is ignored and the default value is returned instead.
+     * it is ignored and the default value is returned instead.
      *
      * @param <T>          The type to coerce the indexed value to.
      * @param index        The position

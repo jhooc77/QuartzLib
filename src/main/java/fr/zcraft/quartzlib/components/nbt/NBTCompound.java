@@ -30,6 +30,7 @@
 
 package fr.zcraft.quartzlib.components.nbt;
 
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -90,10 +91,13 @@ public class NBTCompound implements Map<String, Object> {
 
     private Map<String, Object> getNbtMap() {
         if (nmsNbtMap == null) {
+            PluginLogger.info("nmsNbtMap == null");
             nmsNbtMap = new HashMap<>();
             if (nmsNbtTag != null) {
+                PluginLogger.info("nmsNbtTag != null");
                 NBTType.TAG_COMPOUND.setData(nmsNbtTag, nmsNbtMap);
             } else {
+                PluginLogger.info("nmsNbtTag == null");
                 nmsNbtTag = NBTType.TAG_COMPOUND.newTag(nmsNbtMap);
                 NBTType.TAG_LIST.setData(nmsNbtTag, nmsNbtTag);
 
@@ -105,13 +109,16 @@ public class NBTCompound implements Map<String, Object> {
                     }
                 }
             }
+        } else {
+            PluginLogger.info("nmsNbtMap != null");
+            PluginLogger.info("nmsNbtMap " + nmsNbtMap.toString());
         }
-
         return nmsNbtMap;
     }
 
     /**
      * Returns the NMS NBTTagCompound instance.
+     *
      * @return The NMS NBTTagCompound instance.
      */
     Object getNbtTagCompound() {
@@ -120,15 +127,15 @@ public class NBTCompound implements Map<String, Object> {
 
     /**
      * Returns the value to which the specified key is mapped,
-     *     or the specified default value if this map contains no mapping for the key.
+     * or the specified default value if this map contains no mapping for the key.
      * If a value is present, but could not be coerced to the given type,
-     *     it is ignored and the default value is returned instead.
+     * it is ignored and the default value is returned instead.
      *
      * @param <T>          The type to coerce the mapped value to.
      * @param key          The key
      * @param defaultValue The default value.
      * @return the value to which the specified key is mapped,
-     *     or the specified default value if this map contains no mapping for the key.
+     *         or the specified default value if this map contains no mapping for the key.
      */
     public <T> T get(String key, T defaultValue) {
         return get(key, defaultValue, defaultValue == null ? null : (Class<T>) defaultValue.getClass());
@@ -136,18 +143,18 @@ public class NBTCompound implements Map<String, Object> {
 
     /**
      * Returns the value to which the specified key is mapped,
-     *     or the specified default value if this map contains no mapping for the key.
+     * or the specified default value if this map contains no mapping for the key.
      * If a value is present, but could not be coerced to the given type,
-     *     it is ignored and the default value is returned instead.
+     * it is ignored and the default value is returned instead.
      * This version of the method is recommended if the defaultValue parameter is null,
-     *     so it can have enough type information to protect against wrong NBT types.
+     * so it can have enough type information to protect against wrong NBT types.
      *
      * @param <T>          The type to coerce the mapped value to.
      * @param key          The key
      * @param defaultValue The default value.
      * @param valueType    The type of the expected value.
      * @return the value to which the specified key is mapped,
-     *     or the specified default value if this map contains no mapping for the key.
+     *         or the specified default value if this map contains no mapping for the key.
      */
     public <T> T get(String key, T defaultValue, Class<T> valueType) {
         try {
@@ -219,6 +226,11 @@ public class NBTCompound implements Map<String, Object> {
 
     @Override
     public Object put(String key, Object value) {
+        PluginLogger.info("put nbt value");
+        PluginLogger.info(getNbtMap().toString());
+        PluginLogger.info("KEY " + key);
+        PluginLogger.info("VALUE " + NBT.fromNativeValue(value));
+
         return NBT.toNativeValue(getNbtMap().put(key, NBT.fromNativeValue(value)));
     }
 

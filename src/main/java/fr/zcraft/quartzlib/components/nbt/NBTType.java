@@ -30,8 +30,10 @@
 
 package fr.zcraft.quartzlib.components.nbt;
 
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.reflection.Reflection;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +61,7 @@ enum NBTType {
     NBTType(byte id, String nmsClassName, Class... types) {
         this.id = id;
         this.types = types;
-        this.nmsClassName = nmsClassName;
+        this.nmsClassName = "nbt." + nmsClassName;
     }
 
     public static NBTType fromId(byte id) {
@@ -93,7 +95,8 @@ enum NBTType {
     public String getNmsTagFieldName() {
         switch (this) {
             case TAG_COMPOUND:
-                return "map";
+                return "tags";//Modified in 1.17 from map to tags
+            //TODO add a version check here
             case TAG_LIST:
                 return "list";
             default:
@@ -152,6 +155,7 @@ enum NBTType {
             final Object tag;
             switch (this) {
                 case TAG_COMPOUND:
+                    PluginLogger.info("Tag_compound");
                     tag = Reflection.instantiate(getNmsClass());
                     if (value instanceof NBTCompound) {
                         setData(tag, ((NBTCompound) value).nmsNbtMap);
@@ -161,6 +165,7 @@ enum NBTType {
                     break;
 
                 case TAG_LIST:
+                    PluginLogger.info("Tag_list");
                     tag = Reflection.instantiate(getNmsClass());
                     if (value instanceof NBTList) {
                         setData(tag, ((NBTList) value).nmsNbtList);
@@ -174,6 +179,7 @@ enum NBTType {
                     break;
 
                 default:
+                    PluginLogger.info("default");
                     Constructor cons = Reflection.findConstructor(getNmsClass(), 1);
                     cons.setAccessible(true);
                     tag = cons.newInstance(value);
@@ -192,15 +198,48 @@ enum NBTType {
         try {
             return Reflection.getFieldValue(nmsNbtTag, getNmsTagFieldName());
         } catch (Exception ex) {
-            throw new NBTException("Unable to retrieve NBT tag data", ex);
+            try {
+                return Reflection.call(Reflection.getMinecraftClassByName("nbt.NBTTagCompound"), nmsNbtTag, "h");
+            } catch (Exception e) {
+                throw new NBTException("Unable to retrieve NBT tag data", e);
+            }
         }
     }
 
     public void setData(Object nmsNbtTag, Object value) {
         try {
             Reflection.setFieldValue(nmsNbtTag, getNmsTagFieldName(), value);
+
         } catch (Exception ex) {
-            throw new NBTException("Unable to set NBT tag data", ex);
+            try {
+                PluginLogger.info(getNmsTagFieldName() + " value: " + value);
+                Class nbtBaseClass = Reflection.getMinecraftClassByName(
+                        "nbt.NBTBase");
+                //Todo Maybe an issue here with older naming that used NBTbase instead of NBTBase
+                Class nbtTagCompoundClass = Reflection.getMinecraftClassByName("nbt.NBTTagCompound");
+                //Object nbtTagCompound = Reflection.instantiate(nbtTagCompoundClass);
+                //Object nbtBase = nbtBaseClass.cast(nbtTagCompound);
+                if (value instanceof ArrayList) {
+                    ArrayList<Object> valueList = ((ArrayList<Object>) value);
+                    for (Object val : valueList) {
+
+                        PluginLogger.info(value + " " + val.getClass().getName());
+                    }
+                } else {
+                    Map<String, Object> valueMap = ((Map<String, Object>) value);
+                    for (Map.Entry<String, Object> entry : valueMap.entrySet()) {
+                        PluginLogger.info("key " + entry.getKey() + " Value: " + entry.getValue());
+                        PluginLogger.info("" + entry.getValue().getClass().getName());
+                    }
+                }
+                //Reflection.call(Reflection.getMinecraftClassByName("nbt.NBTTagCompound"), nmsNbtTag, "set",
+                //        getNmsTagFieldName(),
+                //        value);
+                //creer nouveau ntbtagcompound avec les nouvelles valeurs, faire le set.
+                //NBTBase nbtbase = (NBTBase) this.tags.get(s);
+            } catch (Exception e) {
+                throw new NBTException("Unable to set NBT tag data", e);
+            }
         }
     }
 }

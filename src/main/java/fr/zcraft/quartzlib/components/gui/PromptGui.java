@@ -109,11 +109,11 @@ public class PromptGui extends GuiBase {
             final Class<?> CraftSign =
                     Reflection.getBukkitClassByName("block.CraftSign");
             final Class<?> classTileEntitySign =
-                    Reflection.getMinecraftClassByName("server.level.block.entity.TileEntitySign");
+                    Reflection.getMinecraftClassByName("world.level.block.entity.TileEntitySign");
             final Class<?> CraftPlayer =
                     Reflection.getBukkitClassByName("entity.CraftPlayer");
             final Class<?> EntityHuman =
-                    Reflection.getMinecraftClassByName("server.world.entity.player.EntityHuman");
+                    Reflection.getMinecraftClassByName("world.entity.player.EntityHuman");
 
             try {
                 fieldTileEntitySign = Reflection.getField(CraftSign, "sign");
@@ -122,11 +122,17 @@ public class PromptGui extends GuiBase {
             }
 
             try {
+                //1.17+
                 fieldTileEntitySignEditable = Reflection.getField(classTileEntitySign, "isEditable");
-            } catch (NoSuchFieldException e) { // 1.11.2 or below
-                fieldTileEntitySignEditable = null;
-            }
+            } catch (NoSuchFieldException e) {
+                try {
+                    PluginLogger.info("before field");
+                    fieldTileEntitySignEditable = Reflection.getField(classTileEntitySign, "isEditable");
 
+                } catch (NoSuchFieldException ex) { // 1.11.2 or below
+                    fieldTileEntitySignEditable = null;
+                }
+            }
             methodGetHandle = CraftPlayer.getDeclaredMethod("getHandle");
             methodOpenSign = EntityHuman.getDeclaredMethod("openSign", classTileEntitySign);
         } catch (Exception e) {
@@ -220,6 +226,7 @@ public class PromptGui extends GuiBase {
 
     @Override
     protected void open(final Player player) {
+        PluginLogger.info("\n\nopen");
         super.open(player);
 
         signLocation = findAvailableLocation(player);
@@ -237,21 +244,31 @@ public class PromptGui extends GuiBase {
         block.setType(Material.OAK_SIGN, false);
 
         final Sign sign = (Sign) block.getState();
+
+        PluginLogger.info("before setting sign content");
         setSignContents(sign, contents);
+        PluginLogger.info("before sign updtae");
         sign.update();
+        PluginLogger.info("after sign update");
+
+        PluginLogger.info("isEditable " + sign.isEditable());
 
         RunTask.later(() -> {
             try {
+                PluginLogger.info("task run later");
                 final Object signTileEntity = fieldTileEntitySign.get(sign);
                 final Object playerEntity = methodGetHandle.invoke(player);
-
+                PluginLogger.info("test");
                 // In Minecraft 1.12+, there's a lock on the signs to avoid them
                 // to be edited after they are loaded into the game.
                 if (fieldTileEntitySignEditable != null) {
+                    PluginLogger.info("here?");
                     fieldTileEntitySignEditable.set(signTileEntity, true);
+                    PluginLogger.info("there?");
                 }
-
+                PluginLogger.info("invoke");
                 methodOpenSign.invoke(playerEntity, signTileEntity);
+                PluginLogger.info("invoked");
             } catch (final Throwable e) {
                 PluginLogger.error("Error while opening Sign prompt", e);
             }
@@ -260,6 +277,8 @@ public class PromptGui extends GuiBase {
 
     @Override
     protected void onClose() {
+        PluginLogger.info("onClose Prompt");
+        PluginLogger.info("loc " + signLocation);
         final Block block = signLocation.getWorld().getBlockAt(signLocation);
         block.setType(Material.AIR);
 

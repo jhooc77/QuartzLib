@@ -30,6 +30,7 @@
 
 package fr.zcraft.quartzlib.components.nbt;
 
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemUtils;
 import fr.zcraft.quartzlib.tools.reflection.NMSException;
 import fr.zcraft.quartzlib.tools.reflection.Reflection;
@@ -69,7 +70,9 @@ public abstract class NBT {
      * @throws NMSException If there was any issue while assigning NBT data.
      */
     public static NBTCompound fromItemStack(ItemStack item) throws NMSException {
+        PluginLogger.info("fromItemStack");
         init();
+        PluginLogger.info("init ok");
         try {
             return new NBTCompound(getMcNBTCompound(item));
         } catch (Exception ex) {
@@ -176,10 +179,10 @@ public abstract class NBT {
      * @param item The ItemStack to change.
      * @param tags The tags to place inside the stack.
      * @return An item stack with the modification applied. It may (if you given
-     *     a CraftItemStack) or may not (else) be the same instance as the given one.
+     *         a CraftItemStack) or may not (else) be the same instance as the given one.
      * @throws NMSException if the operation cannot be executed.
      * @see #addToItemStack(ItemStack, Map, boolean) This method is equivalent
-     *     to this one with replace = true.
+     *         to this one with replace = true.
      */
     public static ItemStack addToItemStack(ItemStack item, Map<String, Object> tags) throws NMSException {
         return addToItemStack(item, tags, true);
@@ -197,7 +200,7 @@ public abstract class NBT {
      * @param replace {@code true} to replace the whole set of tags. If {@code
      *                false}, tags will be added.
      * @return An item stack with the modification applied. It may (if you given
-     *     a CraftItemStack) or may not (else) be the same instance as the given one.
+     *         a CraftItemStack) or may not (else) be the same instance as the given one.
      * @throws NMSException if the operation cannot be executed.
      */
     public static ItemStack addToItemStack(final ItemStack item, final Map<String, Object> tags, final boolean replace)
@@ -258,13 +261,18 @@ public abstract class NBT {
     }
 
     private static void init() throws NMSException {
+        PluginLogger.info("init");
         if (MC_ITEM_STACK != null) {
+            PluginLogger.info("already initialized");
             return; // Already initialized
         }
-
-        MC_ITEM_STACK = getMinecraftClass("server.world.item.ItemStack");
+        PluginLogger.info("ItemStack");
+        MC_ITEM_STACK = getMinecraftClass("world.item.ItemStack");
+        PluginLogger.info("NBTTagCompound");
         MC_NBT_TAG_COMPOUND = getMinecraftClass("nbt.NBTTagCompound");
+        PluginLogger.info("CraftMetaItem");
         CB_CRAFT_ITEM_META = getCraftBukkitClass("inventory.CraftMetaItem");
+        PluginLogger.info("done");
     }
 
     /**
@@ -285,20 +293,30 @@ public abstract class NBT {
         }
 
         try {
-            Object tag = Reflection.getFieldValue(MC_ITEM_STACK, mcItemStack, "tag");
-
+            Object tag;
+            try {
+                PluginLogger.info("before");
+                tag = Reflection.call(mcItemStack, "getTag");
+                PluginLogger.info("got tag");
+            } catch (java.lang.NoSuchMethodException ex) {
+                //older than 1.17
+                tag = Reflection.getFieldValue(MC_ITEM_STACK, mcItemStack, "tag");
+            }
             if (tag == null) {
                 tag = Reflection.instantiate(MC_NBT_TAG_COMPOUND);
 
                 try {
+                    PluginLogger.info("setting tag " + tag);
                     Reflection.call(MC_ITEM_STACK, mcItemStack, "setTag", tag);
                 } catch (NoSuchMethodException e) {
                     // If the set method change—more resilient,
                     // as the setTag will only update the field without any kind of callback.
+                    PluginLogger.info("NoSuchMethodException ");
                     Reflection.setFieldValue(MC_ITEM_STACK, mcItemStack, "tag", tag);
+
                 }
             }
-
+            PluginLogger.info("Fin");
             return tag;
         } catch (Exception ex) {
             throw new NMSException("Unable to retrieve NBT tag from item", ex);
