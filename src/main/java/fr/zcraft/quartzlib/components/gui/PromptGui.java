@@ -86,6 +86,7 @@ public class PromptGui extends GuiBase {
      */
     public static boolean isAvailable() {
         if (!isInitialized) {
+            PluginLogger.info("isnot init");
             init();
         }
         return fieldTileEntitySign != null;
