@@ -31,6 +31,7 @@
 package fr.zcraft.quartzlib.core;
 
 import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.PluginLogger.DebugLevel;
 import java.io.File;
 import java.io.IOException;
 import java.util.jar.JarFile;
@@ -46,6 +47,8 @@ import org.bukkit.plugin.java.JavaPluginLoader;
  * them).</p>
  */
 public abstract class QuartzPlugin extends JavaPlugin {
+    private DebugLevel debugLevel = DebugLevel.NONE;
+
     protected QuartzPlugin() {
         super();
     }
@@ -97,4 +100,13 @@ public abstract class QuartzPlugin extends JavaPlugin {
             return null;
         }
     }
+
+    public DebugLevel getDebugLevel() {
+        return debugLevel;
+    }
+
+    public void setDebugLevel(DebugLevel level) {
+        debugLevel = level;
+    }
+
 }

@@ -31,7 +31,13 @@
 package fr.zcraft.quartzlib.tools;
 
 import fr.zcraft.quartzlib.core.QuartzLib;
+import fr.zcraft.quartzlib.core.QuartzPlugin;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -93,6 +99,100 @@ public final class PluginLogger {
         log(Level.SEVERE, message, args);
     }
 
+    /**
+     * Will store logs in the folder /logs of the plugin with the following format:
+     * log-DebugLevel-Date-VersionNumber.log
+     */
+    public static void debug(Boolean keepLog, QuartzPlugin plugin, DebugLevel dl, String message, Object... args) {
+        if (!keepLog) {
+            debug(plugin, dl, message, args);
+        }
+        File logsDirectory = new File(plugin.getDataFolder(), "logs");
+
+        logsDirectory.mkdir();
+
+        int versionNumber = 1;
+        String fileName;
+        do {
+            fileName =
+                    "log-" + plugin.getDebugLevel().name() + "-" + LocalDate.now() + "-" + versionNumber + ".log";
+            versionNumber++;
+        } while (new File(fileName).exists());
+
+        File logFile = new File(logsDirectory, fileName);
+
+        debug(logFile, plugin, dl, message, args);
+    }
+
+    public static void debug(File logFile, QuartzPlugin plugin, DebugLevel dl, String message, Object... args) {
+        debug(plugin, dl, message, args);
+        try {
+            logFile.createNewFile();
+            FileWriter fileWriter = new FileWriter(logFile);
+            DebugLevel debugLevel = plugin.getDebugLevel();
+            switch (dl) {
+                case USER_LOG:
+                    if (debugLevel == DebugLevel.USER_LOG || debugLevel == DebugLevel.DEVELOPER_LOG) {
+                        fileWriter.write(message);
+                    }
+                    break;
+                case SYSTEM_LOG:
+                    if (debugLevel == DebugLevel.SYSTEM_LOG || debugLevel == DebugLevel.DEVELOPER_LOG) {
+                        fileWriter.write(message);
+                    }
+                    break;
+                case DEVELOPER_LOG:
+                    if (debugLevel == DebugLevel.DEVELOPER_LOG) {
+                        fileWriter.write(message);
+                    }
+                    break;
+                case NONE:
+                default:
+                    break;
+            }
+
+        } catch (IOException e) {
+            error("Can't find file " + logFile.getName());
+        }
+    }
+
+    public static void debug(QuartzPlugin plugin, DebugLevel dl, String message, Object... args) {
+        DebugLevel debugLevel = plugin.getDebugLevel();
+        switch (dl) {
+            case USER_LOG:
+                if (debugLevel == DebugLevel.USER_LOG || debugLevel == DebugLevel.DEVELOPER_LOG) {
+                    info(message, args);
+                }
+                break;
+            case SYSTEM_LOG:
+                if (debugLevel == DebugLevel.SYSTEM_LOG || debugLevel == DebugLevel.DEVELOPER_LOG) {
+                    info(message, args);
+                }
+                break;
+            case DEVELOPER_LOG:
+                if (debugLevel == DebugLevel.DEVELOPER_LOG) {
+                    info(message, args);
+                }
+                break;
+            case NONE:
+            default:
+                break;
+        }
+    }
+
+    public static void debug(QuartzPlugin plugin, DebugLevel dl, List<String> messages, Object... args) {
+        for (String message : messages) {
+            debug(plugin, dl, message, args);
+        }
+    }
+
+    /*public static void debug(QuartzPlugin plugin, DebugLevel dl, List<Object> messages, Object... args) {
+        for (Object message : messages) {
+            debug(plugin, dl, message.toString(), args);
+        }
+    }
+   */
+
     private static Logger getLogger() {
         Thread currentThread = Thread.currentThread();
         if (currentThread.equals(mainThread)) {
@@ -108,6 +208,13 @@ public final class PluginLogger {
             loggers.put(thread, logger);
         }
         return logger;
+    }
+
+    public enum DebugLevel {
+        NONE,
+        USER_LOG,
+        DEVELOPER_LOG,
+        SYSTEM_LOG
     }
 
     private static class PluginThreadLogger extends Logger {
